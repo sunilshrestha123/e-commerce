@@ -1,6 +1,11 @@
 const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 const app = express();
 const tourRouter = require('./routes/tourRoutes');
 const globalErrorhandler = require('./controllers/errorController');
@@ -9,11 +14,29 @@ const categoryRouter = require('./routes/categoryRoutes');
 const mainmenuRouter = require('./routes/mainmenuRouter');
 const AppError = require('./utils/appError');
 //1>MIDDLE WARE
-
+///set secuirty http header
+app.use(helmet());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-app.use(express.json());
+
+const limiter = rateLimit({
+  max: 3,
+  windowMs: 60 * 60 * 1000,
+  message: 'too many request from ip ,please try again in hour',
+});
+app.use('/api', limiter);
+app.use(express.json({ limit: '10kb' }));
+///data sanitagation against noquery injection
+app.use(mongoSanitize());
+
+app.use(xss());
+//prevent the http pollutoion
+app.use(
+  hpp({
+    whitelist: ['duration'],
+  })
+);
 app.use(express.static(`${__dirname}/public`));
 
 // app.use((req, res, next) => {
@@ -22,6 +45,8 @@ app.use(express.static(`${__dirname}/public`));
 // });
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+
+  // console.log(req.headers);
   next();
 });
 const tours = JSON.parse(

@@ -4,7 +4,7 @@ exports.getAllCategory = (req, res) => {
     mesage: 'this route is not define yetr ',
   });
 };
-exports.CreateCategory = (req, res) => {
+exports.CreateCategory = (req, res, next) => {
   res.status(500).json({
     status: 'error',
     mesage: 'this route is not define yetr ',

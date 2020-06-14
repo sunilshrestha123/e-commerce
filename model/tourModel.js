@@ -73,6 +73,14 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
     },
     startDates: [Date],
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinate: [Number],
+    },
     secretTour: {
       type: Boolean,
       default: false,
