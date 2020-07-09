@@ -2,13 +2,23 @@ const mongoose = require('mongoose');
 
 const slideSchema = new mongoose.Schema({
   heading: {
-    type: string,
+    type: String,
   },
   des: {
     type: String,
   },
-  image: String,
-  required: [true, 'please enter the image '],
+  photo: {
+    type: String,
+    required: [true, 'please enter the image '],
+  },
+  createAt: {
+    type: Date,
+    defaut: Date.now(),
+  },
+  updateAt: {
+    type: Date,
+    default: Date.now(),
+  },
 });
-const Slide = mongoose.model('Slide', sideSchema);
+const Slide = mongoose.model('Slide', slideSchema);
 module.exports = Slide;

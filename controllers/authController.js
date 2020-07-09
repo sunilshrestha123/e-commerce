@@ -108,7 +108,7 @@ exports.restrictTo = (...roles) => {
     //roles['admin','lead-guid']
     if (!roles.includes(req.user.role)) {
       return next(
-        new AppError('you do not have premisses to p erform this action ', 403)
+        new AppError('you do not have premisses to perform this action ', 403)
       );
     }
     next();

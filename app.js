@@ -1,3 +1,4 @@
+const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan');
@@ -6,13 +7,20 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
-const app = express();
-const tourRouter = require('./routes/tourRoutes');
 const globalErrorhandler = require('./controllers/errorController');
+const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const categoryRouter = require('./routes/categoryRoutes');
-const mainmenuRouter = require('./routes/mainmenuRouter');
+const slideRouter = require('./routes/slideRoutes');
+// const mainmenuRouter = require('./routes/mainmenuRouter');
+const reviewRouter = require('./routes/reviewRoutes');
 const AppError = require('./utils/appError');
+const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
 //1>MIDDLE WARE
 ///set secuirty http header
 app.use(helmet());
@@ -21,7 +29,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const limiter = rateLimit({
-  max: 3,
+  max: 100,
   windowMs: 60 * 60 * 1000,
   message: 'too many request from ip ,please try again in hour',
 });
@@ -37,7 +45,7 @@ app.use(
     whitelist: ['duration'],
   })
 );
-app.use(express.static(`${__dirname}/public`));
+// app.use(express.static(`${__dirname}/public`));
 
 // app.use((req, res, next) => {
 //   console.log('hello from the middleware 🤝 ');
@@ -61,10 +69,16 @@ const tours = JSON.parse(
 // app.delete('/api/v1/tours/:id'), DeleteById;
 
 //3 rOUTE
+app.get('/', (req, res) => {
+  res.status(200).render('base');
+});
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/slides', slideRouter);
+app.use('/api/v1/category', categoryRouter);
+
 // app.use('/api/v1/mainmenu', mainmenuRouter);
-// app.use('/api/v1/category', categoryRouter);
 // app.use('/api/v1/contactus', contactusRouter);
 // app.use('/api/v1/product', productRouter);
 app.all('*', (req, res, next) => {

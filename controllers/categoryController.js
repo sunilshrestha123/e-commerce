@@ -1,30 +1,36 @@
-exports.getAllCategory = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    mesage: 'this route is not define yetr ',
+const Category = require('../model/categoryModel');
+const catchAsync = require('./../utils/catchAsync');
+const factory = require('./handlerFactory');
+exports.getAllCategory = catchAsync(async (req, res, next) => {
+  const getCategorys = await Category.find(req.body);
+  res.status(200).json({
+    status: 'sucess',
+    data: {
+      getCategorys,
+    },
   });
-};
-exports.CreateCategory = (req, res, next) => {
-  res.status(500).json({
-    status: 'error',
-    mesage: 'this route is not define yetr ',
+});
+
+exports.CreateCategory = catchAsync(async (req, res, next) => {
+  const newCategory = await Category.create(req.body);
+  res.status(200).json({
+    status: 'sucess',
+    mesage: 'data is insert  ',
   });
-};
-exports.getCategory = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    mesage: 'this route is not define yetr ',
+});
+
+exports.getCategory = catchAsync(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
+  if (!category) {
+    return next(new AppError('No category with that id ', 404));
+  }
+  res.status(200).json({
+    status: 'sucess',
+    data: {
+      category: { category },
+    },
   });
-};
-exports.UpdateCategory = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    mesage: 'this route is not define yetr ',
-  });
-};
-exports.DeleteCategory = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    mesage: 'this route is not define yetr ',
-  });
-};
+});
+
+exports.updateCategory = factory.updateOne(Category);
+exports.deleteCategory = factory.deleteOne(Category);
